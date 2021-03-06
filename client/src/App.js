@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
+import { useDispatch } from 'react-redux';
 import {
   CssBaseline,
   Container,
@@ -17,7 +18,10 @@ import {
   Redirect,
 } from "react-router-dom";
 import PenIcon from "@material-ui/icons/Create";
-import PostsList from "./components/PostList";
+import PostsList from "./components/PostsList";
+import AddPostForm from "./components/AddPostForm";
+import PostDetails from './components/PostDetails';
+import { fetchPosts } from './actions/post';
 
 const useStyles = makeStyles( theme => ({
   root: {
@@ -35,6 +39,22 @@ const useStyles = makeStyles( theme => ({
 }))
 
 const App = () => {
+
+  const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchPosts())
+  }, [dispatch]);
+
+  const handleOpen = () => {
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
   const classes = useStyles();
   return (
     <>
@@ -45,10 +65,10 @@ const App = () => {
             <IconButton edge="start" className={classes.container} color="inherit"/>
 
             <Typography variant="h6" color="secondary" className={classes.title}>
-              <a href="http://localhost:3000/posts">Blogify</a>
+              <a href="http://localhost:3000/posts">HB Blog</a>
             </Typography>
 
-            <Button color="primary" variant="outlined" startIcon={<PenIcon />}>
+            <Button color="primary" variant="outlined" startIcon={<PenIcon />} onClick={handleOpen}>
               Yeni Yazı
             </Button>
           </Toolbar>
@@ -59,14 +79,17 @@ const App = () => {
             <Router>
               <Switch>
                 <Route exact path="/posts" component={PostsList} />
+                <Route exact path="/posts/:id" component={PostDetails} />
               </Switch>
 
-              <Redirect from="/" to="/posts" />
+              {/* <Redirect from="/" to="/posts" /> */}
             </Router>
           </Grid>
         </Grid>
         
       </Container>
+
+      <AddPostForm open={open} handleClose={handleClose} />
     </>
   )
 };
